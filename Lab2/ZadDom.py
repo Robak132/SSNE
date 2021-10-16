@@ -7,6 +7,7 @@ import time
 import math
 import pandas as pd
 
+
 ### Spróbujmy przewidzieć ocenę wina na podstawie jego parametrów
 
 
@@ -28,12 +29,13 @@ class WineDataset(data.Dataset):
 
 
 class SimpleEstimator(nn.Module):
-    def __init__(self, num_inputs, num_hidden, num_outputs):
+    def __init__(self, num_inputs, num_hidden, num_outputs, _device):
         super().__init__()
         # Initialize the modules we need to build the network
         self.linear1 = nn.Linear(num_inputs, num_hidden)
-        self.act_fn = nn.Tanh()
+        self.act_fn = nn.ReLU()
         self.linear2 = nn.Linear(num_hidden, num_outputs)
+        self.to(_device)
 
     def forward(self, x):
         # Perform the calculation of the model to determine the prediction
@@ -48,19 +50,18 @@ def train_network():
     train_data_loader = data.DataLoader(train_dataset, batch_size=512, shuffle=True, drop_last=True)
 
     model.train()
-    # Training loop
     for epoch in range(100):
-        for data_inputs, data_labels in train_data_loader:
+        for data_inputs, data_label in train_data_loader:
             ## Step 1: Move input data to device (only strictly necessary if we use GPU)
             data_inputs = data_inputs.to(device)
-            data_labels = data_labels.to(device)
+            data_label = data_label.to(device)
 
             ## Step 2: Run the model on the input data
             preds = model(data_inputs.float())
             preds = preds.squeeze(dim=1)  # Output is [Batch size, 1], but we want [Batch size]
 
             ## Step 3: Calculate the loss
-            loss = loss_module(preds, data_labels.float())
+            loss = loss_module(preds, data_label.float())
 
             ## Step 4: Perform backpropagation
             # Before calculating the gradients, we need to ensure that they are all zero.
@@ -79,14 +80,15 @@ def test_network():
     test_data_loader = data.DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
     model.eval()
     with torch.no_grad():  # Deactivate gradients for the following code
-        for data_inputs, data_labels in test_data_loader:
-            data_inputs, data_labels = data_inputs.to(device), data_labels.to(device)
+        for data_inputs, data_label in test_data_loader:
+            data_inputs = data_inputs.to(device)
+            data_label = data_label.to(device)
 
-            preds = model(data_inputs.float())
-            preds = preds.squeeze(dim=1)
+            prediction = model(data_inputs.float())
+            prediction = prediction.squeeze(dim=1)
 
-            error = (data_labels - preds).abs().mean()
-            error2 = ((data_labels - preds).abs()**2).mean()
+            error = (data_label - prediction).abs().mean()
+            error2 = ((data_label - prediction).abs() ** 2).mean()
     print(f"Average error: {error:.5f}")
     print(f"Average quadratic error: {error2:.5f}\n")
 
@@ -102,14 +104,9 @@ if __name__ == '__main__':
     train = df.sample(frac=0.8, random_state=200)
     test = df.drop(train.index)
 
-    model = SimpleEstimator(11, 4, 1)
-    model.to(device)
-
+    model = SimpleEstimator(11, 6, 1, device)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
     loss_module = nn.MSELoss()
 
-    for i in range(10):
-        print(f"Try {i}")
-        train_network()
-        test_network()
-
+    train_network()
+    test_network()
