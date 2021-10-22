@@ -2,6 +2,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.utils.data as data
+import numpy as np
 
 ### Spróbujmy przewidzieć ocenę wina na podstawie jego parametrów
 
@@ -10,6 +11,7 @@ class WineDataset(data.Dataset):
     def __init__(self, _data):
         super().__init__()
         self.data = _data[:, :-1]
+        # self.data = self.data / self.data.max(axis=0)
         self.label = _data[:, -1]
 
     def __len__(self):
@@ -24,20 +26,17 @@ class WineDataset(data.Dataset):
 
 
 class SimpleEstimator(nn.Module):
-    def __init__(self, num_inputs, num_hidden1, num_hidden2, num_outputs):
+    def __init__(self, num_inputs, num_hidden1, num_outputs, device):
         super().__init__()
         self.linear1 = nn.Linear(num_inputs, num_hidden1)
-        self.linear2 = nn.Linear(num_hidden1, num_hidden2)
-        self.linear3 = nn.Linear(num_hidden2, num_outputs)
+        self.linear2 = nn.Linear(num_hidden1, num_outputs)
         self.act_fn = torch.nn.modules.activation.ReLU()
+        self.to(device)
 
     def forward(self, x):
         x = self.linear1(x)
         x = self.act_fn(x)
         x = self.linear2(x)
-        x = self.act_fn(x)
-        x = self.linear3(x)
-        x = self.act_fn(x)
         return x
 
 
@@ -100,12 +99,10 @@ if __name__ == '__main__':
     train = df.sample(frac=0.9, random_state=2137)
     test = df.drop(train.index)
 
-    model = SimpleEstimator(11, 8, 4, 1)
-    model.to(device)
-
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+    model = SimpleEstimator(11, 15, 1, device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     loss_module = nn.L1Loss()
 
-    train_network(500)
+    train_network(1000)
     test_network()
 
