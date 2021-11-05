@@ -1,0 +1,14 @@
+MINI Projekt 2
+
+Załóżmy że kilka lat temu w konkursie wygraliśmy 5 Bitcoinów które możemy aktualnie wymienić na 300 000 dolarów. Pieniądze te chcielibyśmy przeznaczyć na zakup mieszkania, ale potrzebujemy metody która dla niepełnych ogłoszeń pomoże nam określić czy dana nieruchomość jest w ogóle w naszym zasięgu. Z pomocą przychodzą nam historyczne dane sprzedażowe.
+
+W oparciu o dostępne atrybuty zbuduj model który pomoże oszacować czy dana nieruchomość kosztuje więcej, czy mniej niż 300 000. Do dyspozycji mają Państwo dane treningowe (train_data.csv) z oryginalnymi cenami nieruchomości (SalePrice), oraz tak jak ostatnio zbiór testowy (test_data.csv) 
+Jako że zadanie jest do zrobienia w domu, proszę przygotować kod który pozwoli na uzyskanie DOKŁADNIE tych samych predykcji które zostały dołączone. W tym celu proszę zadbać o odpowiednie seedy losowych modułów itp.
+
+W ramach rozwiązania, proszę oodać poprzez teamsy plik archiwum .zip z kodem (w formie notebooka, lub skryptu/skryptów .py) oraz plikiem csv z predykcjami na zbiorze test_data.csv. W ramach predykcji proszę zapisać tym razem dwie kolumny:
+- jedną ciągłą którą będzie przewidywanie, czasami błędnie nazywane prawdopodobieństwem, tego że dana nieruchomość ze zbioru test_data jest warta więcej niż 300 000. Wartości te mogą być w dowolnych przedziałach <0,1>, (-inf, +inf) lub dowolne podzbiory.
+- Drugą - binarną (o wartościach 0 i 1) w której sami ustalą Państwo odpowiedni punkt odcięcia i zdecydują które przykłady przewidywać jako 0, a które jako 1. Przyjmijmy że klasa 1 oznacza że nieruchomość jest warta powyżej 300 000.
+Końcowe wyniki obliczał będę w oparciu o powierzchnię pod krzywą ROC  https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score dla ciągłych przewidywań, oraz obliczając accuracy dla binarnych wartości. 
+Bardzo proszę nazywać wszystkie pliki nazwiskami autorów (najlepiej alfabetycznie), lub nazwą zespołu. Nazwę głównego archiwum zip, proszę dodatkowo rozpocząć od przedrostka poniedzialek lub piatek.
+W MS Teams wszystkim przydzieliłem zadanie, ale bardzo proszę żeby tylko jeden (dowolny) członek zespołu je zwrócił.
+W razie pytań zapraszam do korespondencji lub na konsultacje.
